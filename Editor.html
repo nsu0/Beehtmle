@@ -1,0 +1,323 @@
+<script></script>
+
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+</head>
+<body>
+<style>
+#editor {
+background-color: darkgray;
+}
+#viewer {
+float: right;
+position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 20px;
+}
+
+iframe {
+border: 3px solid gray;
+border-radius: 5px;
+margin: 20px;
+background-color: white;
+}
+
+#viewcontrols {
+border: 2px solid gray;
+padding: 5px;
+border-right: 0;
+border-top: 0;
+border-left: 0;
+margin-bottom: 5px;
+position: -webkit-sticky; /* Safari */
+background-image: linear-gradient(darkgray, #4f4f4f);
+  position: sticky;
+  top: 0.3px;
+}
+.file {
+margin: 1.3px;
+}
+.group {
+display: none;
+border-left: 2px solid gray;
+padding-left: 5px;
+margin-left: 5px;
+}
+
+.option {
+overflow: scroll;
+border: 4px solid darkgray;
+margin-top: 10px;
+margin-right: 10px;
+background-image: linear-gradient(#f5f5f5, lightgray);
+margin-left: 10px;
+border-radius: 5px;
+/*outline: 2px solid gray;*/
+padding: 5px;
+margin-bottom: 10px
+}
+
+* {
+font-family: Arial, Helvetica, sans-serif;;
+}
+
+.element {
+margin: 1.3px;
+}
+
+textarea {
+border-radius: 2px;
+color: red;
+border: 3px solid darkgray;
+/*outline: 2px solid gray;*/
+margin: 3px;
+}
+
+#Page, #Asset {
+/*display: none;*/
+}
+#files {
+border-left: 2px solid gray;
+margin-left: 10px;
+background-color: darkgray;
+width: 315px;
+border-radius: 2px;
+}
+.file:hover {
+background-color: gray;
+}
+#contrbaright {
+border: 2px solid gray;
+width: 350px;
+height: auto;
+border-bottom: 0;
+background-color: #f5f5f5;
+background-image: linear-gradient(#f5f5f5, lightgray);
+}
+body {
+margin: 0px;
+background-color: #bdb9b9;
+height: auto;
+}
+
+button {
+padding: 3px;
+border-radius: 3px;
+border: 2px solid gray;
+background-image: linear-gradient(lightgray, darkgray);
+}
+select {
+background-image: linear-gradient(white, lightgray);
+}
+button:active {
+background-image: linear-gradient(darkgray, darkgray);
+}
+.box {
+background-image: linear-gradient(darkgray, gray);
+border: 2px solid darkgray;
+padding: 5px;
+border-radius: 5px;
+}
+
+hr {
+border: 1px, solid, darkgray;
+}
+
+
+</style>
+<div id="editor">
+<iframe scrolling="no" width="420px" height="300px"id="viewer" srcdoc=""></iframe> 
+
+
+<div id="contrbaright">
+<div id="viewcontrols">
+<button onclick="run()">Run</button>
+<select id="sel" name="Page"></select>
+</div>
+
+<div id="files">
+<p id="fola" onclick="clickfol(this.id, 'Assets')" class="file">> 📁 Assets:</p>
+<div class="group" id="Assets"></div>
+<p id="folp" onclick="clickfol(this.id, 'Pages')" class="file">> 📁 Pages:</p>
+<div class="group" id="Pages"></div>
+<p id="fols" onclick="clickfol(this.id, 'Styling')" class="file">> 📁 Styling:</p>
+<div class="group" id="Styling"></div>
+</div>
+<div width="300px" height="250px" class="option">
+
+<div id="Page">
+<p><b>Page:</b></p>
+<p class="box">Script or style elements/tags aren't reccomended to be entered here.</p>
+<div class="box">
+<b id="pagname">Page ?:</b>
+<p class="element"><b>Elements:</b></p>
+<textarea id="pcode" placeholder="Enter HTML elements" class="element"></textarea>
+<br><button onclick="updatepcode()">Update</button><button onclick="addpage(ide)">Add page</button><button onclick="delpage(ide)">Delete page</button>
+</div>
+</div>
+
+<!--
+<div id="Assets">
+<p><b>Assets:</b></p>
+<div class="box">
+<b>Create image path/add image:</b>
+<hr>
+<div class="box"><p>By link:</p><input id="addimg1" placeholder="https://example.com/img.png" type="url"><button onclick="addimg('addimg1')">Add img link</button></div> 
+<hr>
+<div class="box"><p>By Data URI (base64):</p><input id="addimg2" placeholder="data:image/png;base64,..." type="text"><button onclick="addimg('addimg2')">Add base64 img</button></div> 
+<hr>
+<div class="box"><p>Image title (optional):</p><input id="imgtitle" placeholder="My image title" type="text" value="image"></div>
+</div>
+<br>
+<div class="box">
+<b>View image:</b>
+<div width="300px" height="250px" class="option">
+<img id="viewimg" src="blank">
+</div>
+<hr>
+<div class="box"><b>Source:</b><input placeholder="https://example.com/img.png" type="text" id="imgsrcup"><button onclick="updateimgsrc()">Update</button></div>
+<hr><div class="box"><b>Element:</b><p id="imgelem">(element)<p></div>
+</div>
+-->
+
+<div id="Style">
+<p><b>Styling:</b></p>
+<div class="box">
+<b>Main style:</b><br><br>
+<input id="check1" type="checkbox"><b>Scrolling on viewer?</b><br>
+</div>
+</div>
+</div>
+
+
+</div>
+
+</div>
+<script>
+//setup thing
+var ide = 1;
+var ide2 = 1;
+var pagecode;
+addpage(ide);
+addpage(ide);
+
+//adds a page
+function addpage(id) {
+var opt = document.createElement("option");
+opt.value = id;
+opt.innerText = ">𓁗 Page " + id;
+opt.id = ide + "o";
+document.getElementById("sel").appendChild(opt);
+addfile("Pages", "page" + id, ide, "clickpage", " 📝 ")
+ide++;
+}
+
+//updates code
+function updatepcode() {
+pages[pagecode - 1] = document.getElementById("pcode").value;
+}
+
+//when page clicked
+function clickpage(id) {
+document.getElementById("pcode").value = pages[id - 1];
+document.getElementById("Page").style.display = "block";
+document.getElementById("pagname").innerText = "Page " + id + ":";
+pagecode = id;
+}
+
+//delete page
+function delpage() {
+if (ide != 2) {
+ide--;
+var elem = document.getElementById(ide);
+elem.remove();
+pages[ide - 1] = "";
+elem = document.getElementById(ide + "o");
+elem.remove();
+}
+}
+
+//add a file
+function addfile(to, filename,id, fun, icon) {
+var el = document.createElement("p");
+el.innerText = icon + filename;
+el.id = id;
+el.setAttribute("onclick", fun + "(this.id)");
+el.style.margin = "1.3px";
+document.getElementById(to).appendChild(el);
+}
+
+//when a folder is clicked
+function clickfol(id, name) {
+var text = document.getElementById(id).innerText;
+if (text[0] == ">") {
+document.getElementById(id).innerText = "< 📂 " + name + ":";
+document.getElementById(name).style.display = "block";
+} else {
+document.getElementById(id).innerText = "> 📁 " + name + ":";"> 📁 " + name + ":";
+document.getElementById(name).style.display = "none";
+}
+}
+
+//when img file clicked
+function clickimg(id) {
+var imgid = id.slice(0, -1);
+document.getElementById("viewimg").src = imgs[ide2 - 2];
+document.getElementById("imgsrcup").value = imgs[ide2 - 2];
+document.getElementById("imgelem").innerText = "imgsrc[" + imgid + "]";
+}
+
+function updateimgsrc() {
+imgs[ide2 - 2] = document.getElementById("imgsrcup").value;
+document.getElementById("viewimg").src = imgs[ide2 - 2];
+}
+
+//add img
+function addimg(id) {
+imgs[ide2 - 1] = document.getElementById(id).value;
+imgtitle[ide2 - 1] = document.getElementById("imgtitle").value;
+addfile("Assets", imgtitle[ide2 - 1], ide2 + "i", "clickimg", " 🖼 ");
+ide2++;
+}
+
+//Data arrays
+var files = [];
+var pages = ["Hello world!", "What a beatiful day!"];
+var imgs = [];
+var imgtitle = [];
+
+function run() {
+const sel = document.getElementById("sel");
+setuphtml("", pages[sel.selectedIndex]);
+}
+function setuphtml(head, body) {
+var addons = "<script>function include(el, id) { document.getElementById(el + img).display = 'block';}</57script>";
+var images = "";
+var external = "";
+var index = 0;
+/*
+for (var i = 0; i < imgs.length; i++) {
+  images = images + "<img style='display:none;' id='img" + index + "' src='" + imgs[index] + "'>";
+  index++;
+}*/
+var html = "<!DOCTYPE html><head>" + head + "</head><body id='body'>" + body + "</body></html>"
+document.getElementById("viewer").srcdoc = html;
+}
+</script>
+<!--<script>
+$(function() {
+
+  // Target all classed with ".lined"
+  /*$("#pcode").linedtextarea(
+    {selectedLine: 1}
+  );*/
+
+  // Target a single one
+  $("#pcode").linedtextarea();
+
+});
+</script>-->
+</body>
+</html>
